@@ -3117,6 +3117,95 @@ func TestAccAWSDBInstance_RestoreToPointInTime_SourceResourceID(t *testing.T) {
 	})
 }
 
+// TestAccAWSDBInstance_SnapshotIdentifier_EmptyStringOrNullValue ensures
+// a SnapshotIdentifier passed in as an empty string or null passes plan-time
+// validation, and resource creation succeeds w/o subsequent force-new behavior
+// Reference: https://github.com/hashicorp/terraform-provider-aws/issues/17712
+func TestAccAWSDBInstance_SnapshotIdentifier_EmptyStringOrNullValue(t *testing.T) {
+	var dbInstance rds.DBInstance
+	resourceName := "aws_db_instance.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:             testAccAWSDBInstanceConfig_SnapshotIdentifier_EmptyOrNullValue("null"),
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
+			},
+			{
+				Config:             testAccAWSDBInstanceConfig_SnapshotIdentifier_EmptyOrNullValue(""),
+				PlanOnly:           true,
+				ExpectNonEmptyPlan: true,
+			},
+			{
+				Config: testAccAWSDBInstanceConfig_SnapshotIdentifier_EmptyOrNullValue("null"),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSDBInstanceExists(resourceName, &dbInstance),
+				),
+			},
+			{
+				Config:   testAccAWSDBInstanceConfig_SnapshotIdentifier_EmptyOrNullValue("null"),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
+// TestAccAWSDBInstance_SnapshotIdentifier_Name ensures
+// plan-time validation is ignored on the "name" argument after DbInstance creation
+// Reference: https://github.com/hashicorp/terraform-provider-aws/issues/17712
+func TestAccAWSDBInstance_SnapshotIdentifier_Name(t *testing.T) {
+	rName := acctest.RandomWithPrefix("tf-acc-test")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config:      testAccAWSDBInstanceConfig_SnapshotIdentifier_DBName(rName),
+				PlanOnly:    true,
+				ExpectError: regexp.MustCompile(`"name" argument is not supported`),
+			},
+			{
+				Config:      testAccAWSDBInstanceConfig_SnapshotIdentifier_DBName(rName),
+				PlanOnly:    true,
+				ExpectError: regexp.MustCompile(`"username" argument is not supported`),
+			},
+		},
+	})
+}
+
+// TestAccAWSDBInstance_SnapshotIdentifier_Username ensures
+// plan-time validation is ignored on the "username" argument after DbInstance creation
+// Reference: https://github.com/hashicorp/terraform-provider-aws/issues/17712
+func TestAccAWSDBInstance_SnapshotIdentifier_Username(t *testing.T) {
+	var dbInstance rds.DBInstance
+	rName := acctest.RandomWithPrefix("tf-acc-test")
+	resourceName := "aws_db_instance.test"
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckAWSDBInstanceDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testAccAWSDBInstanceConfig_SnapshotIdentifier_Username(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckAWSDBInstanceExists(resourceName, &dbInstance),
+				),
+			},
+			{
+				Config:   testAccAWSDBInstanceConfig_SnapshotIdentifier_Username(rName),
+				PlanOnly: true,
+			},
+		},
+	})
+}
+
 func testAccAWSDBInstanceConfig_orderableClass(engine, version, license string) string {
 	return fmt.Sprintf(`
 data "aws_rds_orderable_db_instance" "test" {
@@ -7288,6 +7377,86 @@ resource "aws_db_instance" "test" {
 
   backup_retention_period  = 1
   delete_automated_backups = false
+}
+`, rName))
+}
+
+func testAccAWSDBInstanceConfig_SnapshotIdentifier_EmptyOrNullValue(snapshotId string) string {
+	return composeConfig(
+		testAccAWSDBInstanceConfig_orderableClassMysql(),
+		fmt.Sprintf(`
+resource "aws_db_instance" "test" {
+  allocated_storage       = 10
+  backup_retention_period = 0
+  engine                  = data.aws_rds_orderable_db_instance.test.engine
+  engine_version          = data.aws_rds_orderable_db_instance.test.engine_version
+  instance_class          = data.aws_rds_orderable_db_instance.test.instance_class
+  name                    = "baz"
+  snapshot_identifier     = "%[1]s" == "null" ? null : "%[1]s"
+  parameter_group_name    = "default.mysql5.6"
+  password                = "barbarbarbar"
+  skip_final_snapshot     = true
+  username                = "foo"
+
+  # Maintenance Window is stored in lower case in the API, though not strictly
+  # documented. Terraform will downcase this to match (as opposed to throw a
+  # validation error).
+  maintenance_window = "Fri:09:00-Fri:09:30"
+}
+`, snapshotId))
+}
+
+func testAccAWSDBInstanceConfig_SnapshotIdentifier_DBName(rName string) string {
+	return composeConfig(testAccAWSDBInstanceConfig_orderableClassMariadb(), fmt.Sprintf(`
+resource "aws_db_instance" "source" {
+  allocated_storage   = 5
+  engine              = data.aws_rds_orderable_db_instance.test.engine
+  identifier          = "%[1]s-source"
+  instance_class      = data.aws_rds_orderable_db_instance.test.instance_class
+  name                = "sourcedb"
+  password            = "avoid-plaintext-passwords"
+  username            = "tfacctest"
+  skip_final_snapshot = true
+}
+
+resource "aws_db_snapshot" "test" {
+  db_instance_identifier = aws_db_instance.source.id
+  db_snapshot_identifier = %[1]q
+}
+
+resource "aws_db_instance" "test" {
+  identifier          = %[1]q
+  instance_class      = aws_db_instance.source.instance_class
+  snapshot_identifier = aws_db_snapshot.test.id
+  name                = aws_db_instance.source.name
+  skip_final_snapshot = true
+}
+`, rName))
+}
+
+func testAccAWSDBInstanceConfig_SnapshotIdentifier_Username(rName string) string {
+	return composeConfig(testAccAWSDBInstanceConfig_orderableClassMariadb(), fmt.Sprintf(`
+resource "aws_db_instance" "source" {
+  allocated_storage   = 5
+  engine              = data.aws_rds_orderable_db_instance.test.engine
+  identifier          = "%[1]s-source"
+  instance_class      = data.aws_rds_orderable_db_instance.test.instance_class
+  password            = "avoid-plaintext-passwords"
+  username            = "tfacctest"
+  skip_final_snapshot = true
+}
+
+resource "aws_db_snapshot" "test" {
+  db_instance_identifier = aws_db_instance.source.id
+  db_snapshot_identifier = %[1]q
+}
+
+resource "aws_db_instance" "test" {
+  identifier          = %[1]q
+  instance_class      = aws_db_instance.source.instance_class
+  snapshot_identifier = aws_db_snapshot.test.id
+  username            = aws_db_instance.source.username
+  skip_final_snapshot = true
 }
 `, rName))
 }

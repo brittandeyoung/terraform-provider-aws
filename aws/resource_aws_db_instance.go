@@ -12,6 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/rds"
 	"github.com/hashicorp/aws-sdk-go-base/tfawserr"
+	"github.com/hashicorp/go-multierror"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/customdiff"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -415,10 +416,9 @@ func resourceAwsDbInstance() *schema.Resource {
 			},
 
 			"snapshot_identifier": {
-				Type:          schema.TypeString,
-				Optional:      true,
-				ForceNew:      true,
-				ConflictsWith: []string{"username"},
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
 			},
 
 			"auto_minor_version_upgrade": {
@@ -534,15 +534,28 @@ func resourceAwsDbInstance() *schema.Resource {
 		},
 
 		CustomizeDiff: customdiff.All(
+			// Validate "name" and/or "username" argument iff restoring from Snapshot
+			// as the arguments are not supported across all DB Instance engines
+			// Reference: https://github.com/hashicorp/terraform-provider-aws/issues/17037
 			func(_ context.Context, diff *schema.ResourceDiff, v interface{}) error {
-				if _, ok := diff.GetOk("snapshot_identifier"); ok {
-					switch strings.ToLower(diff.Get("engine").(string)) {
-					case "mysql", "postgres", "mariadb":
-						if _, ok := diff.GetOk("name"); ok {
-							return fmt.Errorf("name attribute is not supported with snapshot_identifier when engine is %s", diff.Get("engine").(string))
+				// only validate new resources
+				if diff.Id() == "" {
+					if _, ok := diff.GetOk("snapshot_identifier"); ok {
+						var errors *multierror.Error
+						switch strings.ToLower(diff.Get("engine").(string)) {
+						case "mysql", "postgres", "mariadb":
+							if _, ok := diff.GetOk("name"); ok {
+								errors = multierror.Append(errors, fmt.Errorf("name argument is not supported with snapshot_identifier when engine is %s", diff.Get("engine").(string)))
+							}
+							if _, ok := diff.GetOk("username"); ok {
+								errors = multierror.Append(errors, fmt.Errorf("username argument is not supported with snapshot_identifier when engine is %s", diff.Get("engine").(string)))
+							}
 						}
+
+						return errors.ErrorOrNil()
 					}
 				}
+
 				return nil
 			},
 		),
