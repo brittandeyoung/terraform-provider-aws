@@ -91,7 +91,8 @@ func resourceAwsLightsailLoadBalancerAttachmentRead(d *schema.ResourceData, meta
 		LoadBalancerName: aws.String(d.Id()),
 	})
 
-	
+	lb := resp.LoadBalancer
+
 	if err != nil {
 		if awsErr, ok := err.(awserr.Error); ok {
 			if awsErr.Code() == "NotFoundException" {
@@ -106,19 +107,19 @@ func resourceAwsLightsailLoadBalancerAttachmentRead(d *schema.ResourceData, meta
   for index, element := range someSlice {
 
 	var s []string
-	for index, element := range resp.LoadBalancer.InstanceHealthSummary {
+	for index, element := range lb.InstanceHealthSummary {
 		s = append(s, )
 	
-	d.Set("instance_names", resp.LoadBalancer.Arn)
-	d.Set("created_at", resp.LoadBalancer.CreatedAt.Format(time.RFC3339))
-	d.Set("health_check_path", resp.LoadBalancer.HealthCheckPath)
-	d.Set("instance_port", resp.LoadBalancer.InstancePort)
-	d.Set("name", resp.LoadBalancer.Name)
-	d.Set("protocol", resp.LoadBalancer.Protocol)
-	d.Set("public_ports", resp.LoadBalancer.PublicPorts)
-	d.Set("dns_name", resp.LoadBalancer.DnsName)
+	d.Set("instance_names", lb.Arn)
+	d.Set("created_at", lb.CreatedAt.Format(time.RFC3339))
+	d.Set("health_check_path", lb.HealthCheckPath)
+	d.Set("instance_port", lb.InstancePort)
+	d.Set("name", lb.Name)
+	d.Set("protocol", lb.Protocol)
+	d.Set("public_ports", lb.PublicPorts)
+	d.Set("dns_name", lb.DnsName)
 
-	if err := d.Set("tags", keyvaluetags.LightsailKeyValueTags(resp.LoadBalancer.Tags).IgnoreAws().IgnoreConfig(ignoreTagsConfig).Map()); err != nil {
+	if err := d.Set("tags", keyvaluetags.LightsailKeyValueTags(lb.Tags).IgnoreAws().IgnoreConfig(ignoreTagsConfig).Map()); err != nil {
 		return fmt.Errorf("error setting tags: %s", err)
 	}
 
