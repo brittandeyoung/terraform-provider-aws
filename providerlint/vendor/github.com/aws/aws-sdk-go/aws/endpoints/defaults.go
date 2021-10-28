@@ -4257,6 +4257,20 @@ var awsPartition = partition{
 				"us-west-2":  endpoint{},
 			},
 		},
+		"iotsitewise": service{
+
+			Endpoints: endpoints{
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-west-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
 		"iotthingsgraph": service{
 			Defaults: endpoint{
 				CredentialScope: credentialScope{
@@ -5059,6 +5073,28 @@ var awsPartition = partition{
 				"us-west-2":      endpoint{},
 			},
 		},
+		"mgn": service{
+
+			Endpoints: endpoints{
+				"ap-east-1":      endpoint{},
+				"ap-northeast-1": endpoint{},
+				"ap-northeast-2": endpoint{},
+				"ap-northeast-3": endpoint{},
+				"ap-south-1":     endpoint{},
+				"ap-southeast-1": endpoint{},
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-central-1":   endpoint{},
+				"eu-north-1":     endpoint{},
+				"eu-west-1":      endpoint{},
+				"eu-west-2":      endpoint{},
+				"sa-east-1":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-east-2":      endpoint{},
+				"us-west-1":      endpoint{},
+				"us-west-2":      endpoint{},
+			},
+		},
 		"mobileanalytics": service{
 
 			Endpoints: endpoints{
@@ -5388,6 +5424,16 @@ var awsPartition = partition{
 				"us-east-2":  endpoint{},
 				"us-west-1":  endpoint{},
 				"us-west-2":  endpoint{},
+			},
+		},
+		"nimble": service{
+
+			Endpoints: endpoints{
+				"ap-southeast-2": endpoint{},
+				"ca-central-1":   endpoint{},
+				"eu-west-2":      endpoint{},
+				"us-east-1":      endpoint{},
+				"us-west-2":      endpoint{},
 			},
 		},
 		"oidc": service{
@@ -8875,6 +8921,12 @@ var awscnPartition = partition{
 				"cn-northwest-1": endpoint{},
 			},
 		},
+		"iotsitewise": service{
+
+			Endpoints: endpoints{
+				"cn-north-1": endpoint{},
+			},
+		},
 		"kafka": service{
 
 			Endpoints: endpoints{
@@ -10434,6 +10486,12 @@ var awsusgovPartition = partition{
 				"us-gov-west-1": endpoint{},
 			},
 		},
+		"iotsitewise": service{
+
+			Endpoints: endpoints{
+				"us-gov-west-1": endpoint{},
+			},
+		},
 		"kafka": service{
 
 			Endpoints: endpoints{
@@ -11602,6 +11660,12 @@ var awsisoPartition = partition{
 				"us-iso-west-1": endpoint{},
 			},
 		},
+		"ebs": service{
+
+			Endpoints: endpoints{
+				"us-iso-east-1": endpoint{},
+			},
+		},
 		"ec2": service{
 
 			Endpoints: endpoints{
@@ -12039,6 +12103,12 @@ var awsisobPartition = partition{
 			Defaults: endpoint{
 				Protocols: []string{"http", "https"},
 			},
+			Endpoints: endpoints{
+				"us-isob-east-1": endpoint{},
+			},
+		},
+		"ebs": service{
+
 			Endpoints: endpoints{
 				"us-isob-east-1": endpoint{},
 			},
