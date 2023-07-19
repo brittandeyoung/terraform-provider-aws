@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8
-	github.com/aws/aws-sdk-go v1.44.300
+	github.com/aws/aws-sdk-go v1.44.302
 	github.com/aws/aws-sdk-go-v2 v1.19.0
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.5
 	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.19.15
@@ -19,7 +19,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/computeoptimizer v1.24.3
 	github.com/aws/aws-sdk-go-v2/service/directoryservice v1.17.4
 	github.com/aws/aws-sdk-go-v2/service/docdbelastic v1.1.13
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.104.0
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.105.0
 	github.com/aws/aws-sdk-go-v2/service/finspace v1.10.3
 	github.com/aws/aws-sdk-go-v2/service/fis v1.14.13
 	github.com/aws/aws-sdk-go-v2/service/glacier v1.14.14
@@ -43,7 +43,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/resourceexplorer2 v1.2.16
 	github.com/aws/aws-sdk-go-v2/service/rolesanywhere v1.2.3
 	github.com/aws/aws-sdk-go-v2/service/route53domains v1.15.1
-	github.com/aws/aws-sdk-go-v2/service/s3control v1.31.8
+	github.com/aws/aws-sdk-go-v2/service/s3control v1.31.9
 	github.com/aws/aws-sdk-go-v2/service/scheduler v1.1.14
 	github.com/aws/aws-sdk-go-v2/service/securitylake v1.4.4
 	github.com/aws/aws-sdk-go-v2/service/sesv2 v1.18.3
