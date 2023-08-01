@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8
 	github.com/aws/aws-sdk-go v1.44.300
-	github.com/aws/aws-sdk-go-v2 v1.19.0
+	github.com/aws/aws-sdk-go-v2 v1.20.0
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.5
 	github.com/aws/aws-sdk-go-v2/service/accessanalyzer v1.19.15
 	github.com/aws/aws-sdk-go-v2/service/account v1.10.9
@@ -57,7 +57,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/vpclattice v1.0.8
 	github.com/aws/aws-sdk-go-v2/service/workspaces v1.28.16
 	github.com/aws/aws-sdk-go-v2/service/xray v1.16.14
-	github.com/aws/smithy-go v1.13.5
+	github.com/aws/smithy-go v1.14.0
 	github.com/beevik/etree v1.2.0
 	github.com/google/go-cmp v0.5.9
 	github.com/hashicorp/aws-cloudformation-resource-schema-sdk-go v0.21.0
