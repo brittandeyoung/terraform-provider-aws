@@ -57,7 +57,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/vpclattice v1.0.8
 	github.com/aws/aws-sdk-go-v2/service/workspaces v1.28.16
 	github.com/aws/aws-sdk-go-v2/service/xray v1.16.14
-	github.com/aws/smithy-go v1.13.5
+	github.com/aws/smithy-go v1.14.2
 	github.com/beevik/etree v1.2.0
 	github.com/google/go-cmp v0.5.9
 	github.com/hashicorp/aws-cloudformation-resource-schema-sdk-go v0.21.0
